@@ -141,13 +141,13 @@ function checkClass(forDelete)
    }
  }
 
-function percentage() {
+function percentage() { //to string
   if (isFirstNum && firstNum !== "0") {
-    firstNum = Math.round(firstNum * 0.01) / 10 ** 2
+    firstNum = Math.round((firstNum * 0.01) / 10 ** 2).toString()
     displayShow()
   }
   else if (!isFirstNum && secondNum !== "0") {
-    secondNum = (1 / secondNum) * 100
+    secondNum = Math.round((secondNum * 0.01) / 10 ** 2).toString()
     displayShow()
   }
 }
