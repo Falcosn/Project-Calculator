@@ -29,23 +29,25 @@ body
 {
   color: white;
   font-size: 42px;
-  background-color: black;
   height: 80px;
+
+  align-self: flex-end;
 }
 
 .container-display
 {
-  background-color: black;
+  background-color: rgb(44, 70, 44);
   margin-bottom: 10px;
+
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 #container div
 {
- justify-content: center;
+justify-content: flex-end;
  align-items: center;
  display: flex;
- overflow: hidden;
- white-space: nowrap;
 }
 
 #container div button
@@ -59,15 +61,30 @@ body
   cursor: pointer;
 }
 
-.operator,
-#decimal,
-#equal
+.operator
 {
   background-color: orange;
+}
+
+#equal
+{
+  background-color: rgb(250, 78, 78);
+}
+
+.isOn
+{
+  background-color: rgb(255, 207, 118);
 }
 
 #clear, 
 #backspace
 {
   background-color: orangered;
+}
+
+#decimal,
+#percentage,
+#changeValue
+{
+  background-color: orange;
 }

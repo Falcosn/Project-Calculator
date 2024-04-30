@@ -1,18 +1,4 @@
 
-const ButtonNumbers = document.querySelectorAll('.number')
-const ButtonOperators = document.querySelectorAll('.operator')
-
-const ButtonDecimal = document.querySelector('#decimal')
-const ButtonEqual = document.querySelector('#equal')
-const ButtonDelete = document.querySelector('#backspace')
-const ButtonClear = document.querySelector('#clear')
-const Display = document.querySelector('#display')
-
-let numbers = "" 
-let array = []
-let i = 0 
-
-
 document.addEventListener("keydown", (event) => {
   switch (event.key) {
     case ".":
@@ -21,6 +7,9 @@ document.addEventListener("keydown", (event) => {
     case "r":
     case "R":
       clearFun()
+      break;
+    case "c":
+      changeValue()
       break;
     case "Backspace":
       deleteFun()
@@ -74,7 +63,7 @@ function divide (num0, num1)
   return num0 / num1
 }
 
-function ChoseCalculation (operator, num0, num1)
+function getResult (operator, num0, num1)
 {
   switch (operator) {
     case '+':
@@ -88,114 +77,172 @@ function ChoseCalculation (operator, num0, num1)
   }
 }
 
+
+const ButtonNumbers = document.querySelectorAll('.number')
+const ButtonOperators = document.querySelectorAll('.operator')
+
+const ButtonDecimal = document.querySelector('#decimal')
+const ButtonEqual = document.querySelector('#equal')
+const ButtonDelete = document.querySelector('#backspace')
+const ButtonClear = document.querySelector('#clear')
+
+const ButtonPercentage = document.querySelector('#percentage')
+const ButtonChangeValue = document.querySelector('#changeValue')
+
+const Display = document.querySelector('#display')
+
+let firstNum = "0"
+let secondNum = ""
+let operator = ""
+let isFirstNum = true
+
+
+
 function displayShow()
 {
-  Display.innerHTML = array.join(" ");
+  if (isFirstNum) {Display.innerHTML = firstNum}
+  else {Display.innerHTML = secondNum}
+  handleError()
+  checkClass(true)
 }
 
-function checkForOperator()
+function handleError() {
+  if (isNaN(firstNum) || firstNum == "Infinity" || firstNum == "-Infinity")
+  {
+    firstNum = "0"
+    Display.innerHTML = "Error";
+  }
+}
+
+function checkClass(forDelete)
 {
-  return array[i] == "+" || array[i] == "-" || array[i] == "x" || array[i] == "÷" || array[i] == undefined
+  if (forDelete) {
+    for (let i = 0; i < ButtonOperators.length; i++) {
+      ButtonOperators[i].classList.remove("isOn")
+    }
+  } else {
+    for (let i = 0; i < ButtonOperators.length; i++) {
+      if (ButtonOperators[i].classList.contains("isOn")) {return true;}
+    }
+  }
+  
+}
+
+ function changeValue() {
+   if (isFirstNum && firstNum !== "0") {
+     if (firstNum[0] !== "-") {firstNum = "-" + firstNum}
+     else {firstNum = firstNum.slice(1)}
+     displayShow()
+   }
+   else if (!isFirstNum && secondNum !== "0") {
+     if (secondNum[0] !== "-") {secondNum = "-" + secondNum}
+     else {secondNum = secondNum.slice(1)}
+     displayShow()
+   }
+ }
+
+function percentage() {
+  if (isFirstNum && firstNum !== "0") {
+    firstNum = Math.round(firstNum * 0.01) / 10 ** 2
+    displayShow()
+  }
+  else if (!isFirstNum && secondNum !== "0") {
+    secondNum = (1 / secondNum) * 100
+    displayShow()
+  }
 }
 
 function decimalFun() 
 {
-  if (typeof array[i] !== "undefined") { // first array is undefined so to not get error
+  if (isFirstNum) {
+    if (!(firstNum.includes('.'))) {firstNum += "."}
+  }
+  else {
+    if (secondNum == "") (secondNum = "0")
+    if (!(secondNum.includes('.'))) {secondNum += "."}
+  }
 
-    if (!(array[i].includes('.')) && !checkForOperator())
-    {
-      numbers += ButtonDecimal.innerHTML //add context of button to numbers
-      array[i] = numbers
-    }
-    
+  displayShow()
+}
+
+function clearFun() {
+  secondNum = ""
+  firstNum = "0"
+  operator = ""
+  isFirstNum = true
+  displayShow()
+  checkClass(true)
+}
+
+function deleteFun() {
+  if (isFirstNum) {
+   firstNum = firstNum.slice(0, -1)
+   if (firstNum == "") {firstNum = "0"}
+  }
+  else {
+   secondNum = secondNum.slice(0, -1)
+   if (secondNum == "") {secondNum = "0"}
+  }
+  displayShow()
+}
+
+function equalFun() {
+
+  if (firstNum != "" && secondNum != "") {
+    isFirstNum = true
+    firstNum = getResult(operator, parseFloat(firstNum), parseFloat(secondNum))
+    firstNum = Math.round(firstNum * 10 ** 2) / 10 ** 2
+    secondNum = ""
+    firstNum = String(firstNum)
+
     displayShow()
   }  
 }
 
-function clearFun() {
-  i = 0
-  numbers = ""
-  array = []
-  displayShow()
-}
-
-function deleteFun() {
-  if (typeof array[i] !== "undefined" && array[i] !== "Infinity" && array[i] !== "Error") {// first array is undefined so to not get error
-
-    if (array[i].length <= 1) {
-      let IsOperator = checkForOperator()
-      if (array[0].charAt(0) == "-") {array[i] = array[i].slice(0, -1)}
-      numbers = numbers.slice(0, -1)
-      if (i > 0) {i--}
-      if (IsOperator) {numbers = array[i]}
-      array.pop();
-    }
-    else {
-      array[i] = array[i].slice(0, -1)
-      numbers = numbers.slice(0, -1)
-    }
-  
-    displayShow()
-}}
-
-function equalFun() {
-  if (i >= 2 && !checkForOperator()) {
-
-    i = 0
-    numbers = ""
-  
-    const final = array.reduce((firstNumber, currentValue, index, arr) => {
-     
-      secondNumber = parseFloat(arr[2])
-      arr.splice(2, 1)
-      
-      operator = arr[1]
-      arr.splice(1, 1)
-  
-      return ChoseCalculation(operator, firstNumber, secondNumber)
-    }, parseFloat(array[0]))
-    
-      array = []
-      if (isNaN(final)) {
-        Display.innerHTML = "Error"
-      }
-      else if (final == "Infinity") {
-        Display.innerHTML = "Infinity"
-      }
-      else {
-        numbers += parseFloat(Math.round(final * 10 ** 2) / 10 ** 2)
-        array[i] = numbers
-        displayShow()
-      }
-      
-    }
-}
-
 function numberFun(button, isKey) {
-  if (numbers == "0") {
-    array[i] = array[i].slice(0, -1)
-    numbers = numbers.slice(0, -1)
+
+  if (checkClass(false)) {isFirstNum = false} // check if operator is active if is the number is second
+
+  if (isFirstNum) {
+    if (firstNum == "0") {firstNum = ""}
+    isKey ? firstNum += button : firstNum += button.innerHTML
   }
-  if (checkForOperator() && i != 0) {
-    i++;
+  else {
+    if (secondNum == "0") {secondNum = ""}
+    isKey ? secondNum += button : secondNum += button.innerHTML
   }
 
-  isKey ? numbers += button : numbers += button.innerHTML //add context of button to numbers
-  array[i] = numbers
-  
   displayShow()
 }
 
 function operatorFun(button, isKey) {
-  if (!checkForOperator())
-    {    
-      numbers = ""
-      i++
-      isKey ? array[i] = button : array[i] = button.innerHTML // is undefined because innerHTML of event.key is undefined
-
-      displayShow()
+  equalFun() 
+  if (isKey) { // if key sett what button is it
+    for (let i = 0; i <= ButtonOperators.length; i++) {
+      if (ButtonOperators[i].innerHTML == button) {
+        button = ButtonOperators[i]
+        break;
+      }
     }
+  }
+  
+  if (Display.innerHTML !== "Error") {
+
+    if (button.classList.contains("isOn")) {
+      button.classList.remove("isOn")
+    }
+    else {
+      checkClass(true)
+      button.classList.add("isOn")
+    }
+  
+    operator = button.innerHTML 
+  }
 }
+
+ButtonChangeValue.addEventListener('click', changeValue)
+
+ButtonPercentage.addEventListener('click', percentage)
 
 ButtonDecimal.addEventListener('click', decimalFun) 
 
@@ -212,3 +259,5 @@ ButtonNumbers.forEach((button) => {
 ButtonOperators.forEach((button) => { 
   button.addEventListener('click', () => {operatorFun(button, false)})
 })
+
+displayShow()
